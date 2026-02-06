@@ -5,3 +5,4 @@ pyarrow
 schedule
 streamlit
 requests
+altair==4.2.2
