@@ -109,14 +109,25 @@ def launch_dashboard() -> None:
         st.info("No report found for this dataset. Run training/report step first.")
 
     # ------------------------------------------------------
-    # 5) 自然语言问答（Ollama）
+    # 5) 自然语言问答（Ollama + RAG）
     # ------------------------------------------------------
-    st.subheader("LLM Query (Ollama)")
+    st.subheader("LLM Query (Ollama + RAG)")
+    use_rag = st.checkbox("Enable RAG", value=True)
     model_name = st.text_input("Model name", value="qwen2.5")
     query = st.text_input("Ask a question")
+
     if query:
-        context = _build_context(df)
-        st.write(qna_ai.query(query, llm_model=model_name, context=context))
+        if use_rag:
+            answer, hits = qna_ai.query_rag(query, llm_model=model_name, top_k=3)
+            st.write(answer)
+            if hits:
+                with st.expander("RAG Retrieved Sources"):
+                    for h in hits:
+                        st.write({"source": h["source"], "score": h["score"]})
+                        st.code(h["text"])
+        else:
+            context = _build_context(df)
+            st.write(qna_ai.query(query, llm_model=model_name, context=context))
 
 
 if __name__ == "__main__":
