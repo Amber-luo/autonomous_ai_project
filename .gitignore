@@ -1,20 +1,7 @@
-﻿# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environments
-.venv/
-venv/
-
-# Data artifacts
+﻿# Ignore all data by default
 /data/
-/reports/
 
-# Logs
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
+# Allow small demo dataset for Streamlit Cloud
+!data/
+!data/processed/
+!data/processed/demo_dataset.parquet
