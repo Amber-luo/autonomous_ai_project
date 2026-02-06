@@ -43,16 +43,35 @@ def _build_context(df) -> str:
     return "\n".join(parts)
 
 
+def _save_uploaded_parquet(uploaded_file) -> Path:
+    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    out_path = PROCESSED_DIR / uploaded_file.name
+    out_path.write_bytes(uploaded_file.getbuffer())
+    return out_path
+
+
 def launch_dashboard() -> None:
     st.set_page_config(page_title="Autonomous AI Platform", layout="wide")
     st.title("Autonomous AI Platform Dashboard")
+
+    # ------------------------------------------------------
+    # 0) 上传本地真实采集后的 processed 文件
+    # ------------------------------------------------------
+    st.subheader("Upload Processed Dataset (from local CARLA run)")
+    uploaded = st.file_uploader(
+        "Upload a processed parquet file (*_dataset.parquet)",
+        type=["parquet"],
+    )
+    if uploaded is not None:
+        saved_path = _save_uploaded_parquet(uploaded)
+        st.success(f"Uploaded: {saved_path.name}")
 
     # ------------------------------------------------------
     # 1) 选择 processed 数据文件
     # ------------------------------------------------------
     files = _list_processed_files()
     if not files:
-        st.info("No processed dataset found. Run the cleaning step first.")
+        st.info("No processed dataset found. Upload one first.")
         return
 
     file_labels = [f.name for f in files]
